@@ -7,4 +7,14 @@ export interface Calc {
   setState: (state: GraphState, opts: any) => GraphState;
 }
 
-export const calculator: Calc = (window as any).Calc;
+export let calculator: Calc;
+
+function defineCalc() {
+  if (!(window as any).Calc) {
+    setTimeout(defineCalc, 500);
+  } else {
+    calculator = (window as any).Calc;
+  }
+}
+
+defineCalc();
