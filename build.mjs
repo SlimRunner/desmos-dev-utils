@@ -1,4 +1,5 @@
 import esbuild from "esbuild";
+import babel from "esbuild-plugin-babel";
 import parseArgs from "minimist-lite";
 import { loadFile } from "./build-utils.mjs";
 
@@ -39,6 +40,13 @@ const buildOptions = {
   banner: {
     js: userscriptHeader,
   },
+  plugins: [
+    babel({
+      config: {
+        presets: ["@babel/preset-env", "@babel/preset-typescript"],
+      },
+    }),
+  ],
 };
 
 if (argv.watch) {
