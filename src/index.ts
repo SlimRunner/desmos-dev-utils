@@ -1,19 +1,26 @@
 import { calculator } from "Calc";
 
-class Desv {
-  changeTitle(title: string) {
-    calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.setProperty(
-      "title",
-      title
-    );
-  }
+interface Desv {
+  changeTitle: (title: string) => void;
+}
+
+type DesvKeys<T> = {
+  [key in keyof T]: Function;
 }
 
 declare global {
   interface Window {
-    desv: Desv
+    desv: DesvKeys<Desv>
   }
 }
 
-window.desv = new Desv();
+let desv: DesvKeys<Desv> = Object.create(null);
 
+desv.changeTitle = (title: string) => {
+  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.setProperty(
+    "title",
+    title
+  );
+}
+
+window.desv = desv;

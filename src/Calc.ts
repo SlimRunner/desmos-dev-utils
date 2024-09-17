@@ -1,4 +1,4 @@
-import { GraphState } from "State";
+import { GraphState } from "state";
 
 export interface Calc {
   _calc: any;
