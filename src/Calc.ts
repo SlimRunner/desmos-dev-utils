@@ -1,10 +1,22 @@
 import { GraphState } from "state";
+import { ItemModel } from "models";
+
+export interface Controller {
+  getAllItemModels: () => ItemModel[];
+  dispatch: (e: any) => void;
+}
 
 export interface Calc {
   _calc: any;
-  controller: any;
-  getState: (opts: any) => GraphState;
-  setState: (state: GraphState, opts: any) => GraphState;
+  controller: Controller;
+  getState: () => GraphState;
+  setState: (
+    state: GraphState,
+    opts?: {
+      allowUndo?: boolean;
+      remapColors?: boolean;
+    }
+  ) => void;
 }
 
 export let calculator: Calc;
@@ -18,3 +30,5 @@ function defineCalc() {
 }
 
 defineCalc();
+
+export type CalcController = Calc["controller"];
