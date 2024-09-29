@@ -54,4 +54,40 @@ desv.renameAll = (regex: RegExp, repl: string) => {
   });
 };
 
+desv.addNamePrefixToAll = (prefix: string) => {
+  if (prefix === "") {
+    return;
+  }
+  const matchSub = /^(.+_.+)$/;
+  const expressionWithTokenFilter = (item: ItemModel) =>
+    item.type === "expression" &&
+    (item as ExpressionModel).cachedAssignmentOrFunctionName.result !==
+      undefined;
+
+  const tokens = calculator.controller
+    .getAllItemModels()
+    .filter(expressionWithTokenFilter)
+    .map(
+      (item) =>
+        (item as ExpressionModel).cachedAssignmentOrFunctionName.result!.latex
+    );
+
+  const newTokens = tokens.map((item) => {
+    if (matchSub.test(item)) {
+      return item.replace(/\}/, `${prefix}$&`);
+    } else {
+      return `${item}_\{${prefix}\}`;
+    }
+  });
+
+  tokens.forEach((token, i) => {
+    const newToken = newTokens[i];
+    calculator.controller.dispatch({
+      type: "rename-identifier-global",
+      search: token,
+      replace: newToken,
+    });
+  });
+};
+
 window.desv = desv;
