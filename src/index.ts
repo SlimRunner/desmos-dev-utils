@@ -59,10 +59,19 @@ desv.addNamePrefixToAll = (prefix: string) => {
     return;
   }
   const matchSub = /^(.+_.+)$/;
-  const expressionWithTokenFilter = (item: ItemModel) =>
-    item.type === "expression" &&
-    (item as ExpressionModel).cachedAssignmentOrFunctionName.result !==
-      undefined;
+  const filterReserved = (name: string) => {
+    return !["x", "y"].some((t) => t === name);
+  };
+  const expressionWithTokenFilter = (item: ItemModel) => {
+    return (
+      item.type === "expression" &&
+      (item as ExpressionModel).cachedAssignmentOrFunctionName.result !==
+        undefined &&
+      filterReserved(
+        (item as ExpressionModel).cachedAssignmentOrFunctionName.result!.latex
+      )
+    );
+  };
 
   const tokens = calculator.controller
     .getAllItemModels()
