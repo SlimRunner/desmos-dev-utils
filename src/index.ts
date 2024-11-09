@@ -5,6 +5,7 @@ interface Desv {
   changeTitle: (title: string) => void;
   renameAll: (regex: RegExp, repl: string) => void;
   addNamePrefixToAll: (prefix: string) => void;
+  getLargestNumericID: () => string;
 }
 
 type DesvKeys<T> = {
@@ -97,6 +98,17 @@ desv.addNamePrefixToAll = (prefix: string) => {
       replace: newToken,
     });
   });
+};
+
+desv.getLargestNumericID = () => {
+  type idnum = [string, number];
+  const exprlist = calculator.getState().expressions.list;
+  return exprlist
+    .map((e) => [e.id, parseInt(e.id)] as idnum)
+    .filter(([_, num]) => !isNaN(num))
+    .reduce(([acid, acnum], [id, num]) =>
+      acnum > num ? [acid, acnum] : [id, num]
+    )[0];
 };
 
 window.desv = desv;
