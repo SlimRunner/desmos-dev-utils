@@ -21,10 +21,7 @@ declare global {
 let desv: DesvKeys<Desv> = Object.create(null);
 
 desv.changeTitle = (title: string) => {
-  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.setProperty(
-    "title",
-    title
-  );
+  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title = title;
 };
 
 desv.renameAll = (regex: RegExp, repl: string) => {
