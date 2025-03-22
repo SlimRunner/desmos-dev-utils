@@ -17,6 +17,7 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-typescript": "^7.24.7",
+    "@types/desmos": "^1.11.0",
     "esbuild": "^0.23.1",
     "esbuild-plugin-babel": "^0.2.3",
     "minimist-lite": "^2.2.1",

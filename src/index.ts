@@ -1,5 +1,18 @@
-import { calculator } from "Calc";
+import { Calc } from "Calc";
 import { ItemModel, ExpressionModel } from "models";
+import { ItemState } from "state";
+
+export let calculator: Calc;
+
+function defineCalc() {
+  if (!(window as any).Calc) {
+    setTimeout(defineCalc, 500);
+  } else {
+    calculator = (window as any).Calc;
+  }
+}
+
+defineCalc();
 
 interface Desv {
   changeTitle: (title: string) => void;
