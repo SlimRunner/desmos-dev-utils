@@ -19,6 +19,10 @@ interface Desv {
   renameAll: (regex: RegExp, repl: string) => void;
   addNamePrefixToAll: (prefix: string) => void;
   getLargestNumericID: () => string;
+  batchEditor: (options: {
+    filter?: (item: ItemState) => void;
+    mapper?: (item: ItemState) => void;
+  }) => void;
 }
 
 type DesvKeys<T> = {
@@ -34,7 +38,19 @@ declare global {
 let desv: DesvKeys<Desv> = Object.create(null);
 
 desv.changeTitle = (title: string) => {
-  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title = title;
+  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title =
+    title;
+};
+
+desv.batchEditor = (options: {
+  filter?: (item: ItemState) => void;
+  mapper?: (item: ItemState) => void;
+}) => {
+  const state = calculator.getState();
+  state.expressions.list
+    .filter(options.filter ?? (() => true))
+    .forEach(options.mapper ?? (() => {}));
+  calculator.setState(state, { allowUndo: true });
 };
 
 desv.renameAll = (regex: RegExp, repl: string) => {
