@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     0.1.3
+// @version     0.1.4
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -14,17 +14,6 @@
 
 "use strict";
 (function() {
-  // src/Calc.ts
-  var calculator;
-  function defineCalc() {
-    if (!window.Calc) {
-      setTimeout(defineCalc, 500);
-    } else {
-      calculator = window.Calc;
-    }
-  }
-  defineCalc();
-
   // src/index.ts
   function _slicedToArray(r, e) {
     return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
@@ -68,9 +57,29 @@
   function _arrayWithHoles(r) {
     if (Array.isArray(r)) return r;
   }
+  var calculator;
+  function defineCalc() {
+    if (!window.Calc) {
+      setTimeout(defineCalc, 500);
+    } else {
+      calculator = window.Calc;
+    }
+  }
+  defineCalc();
   var desv = /* @__PURE__ */ Object.create(null);
   desv.changeTitle = function(title) {
     calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title = title;
+  };
+  desv.batchEditor = function(options) {
+    var _options$filter, _options$mapper;
+    var state = calculator.getState();
+    state.expressions.list.filter((_options$filter = options.filter) !== null && _options$filter !== void 0 ? _options$filter : function() {
+      return true;
+    }).forEach((_options$mapper = options.mapper) !== null && _options$mapper !== void 0 ? _options$mapper : function() {
+    });
+    calculator.setState(state, {
+      allowUndo: true
+    });
   };
   desv.renameAll = function(regex, repl) {
     var expressionWithTokenFilter = function expressionWithTokenFilter2(item) {
