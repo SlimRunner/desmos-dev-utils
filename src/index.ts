@@ -15,6 +15,8 @@ function defineCalc() {
 defineCalc();
 
 interface Desv {
+  getID: (index: number) => string;
+  getIndex: (id: string) => number;
   changeTitle: (title: string) => void;
   renameAll: (regex: RegExp, repl: string) => void;
   addNamePrefixToAll: (prefix: string) => void;
@@ -23,11 +25,15 @@ interface Desv {
     filter?: (item: ItemState) => void;
     mapper?: (item: ItemState) => void;
   }) => void;
+  listProps: (indices: number[]) => any[];
+  enlistPropValues: (indices: number[]) => any[];
 }
 
 type DesvKeys<T> = {
   [key in keyof T]: Function;
 };
+
+type anyobj = { [key: string]: any };
 
 declare global {
   interface Window {
@@ -36,6 +42,11 @@ declare global {
 }
 
 let desv: DesvKeys<Desv> = Object.create(null);
+
+desv.getID = (index: number) =>
+  calculator.controller.getItemModelByIndex(index)?.id;
+
+desv.getIndex = (id: string) => calculator.controller.getItemModel(id)?.index;
 
 desv.changeTitle = (title: string) => {
   calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title =
@@ -51,6 +62,55 @@ desv.batchEditor = (options: {
     .filter(options.filter ?? (() => true))
     .forEach(options.mapper ?? (() => {}));
   calculator.setState(state, { allowUndo: true });
+};
+
+desv.listProps = (indices: number[] | undefined) => {
+  const indexSet = new Set(indices);
+  const state = calculator.getState();
+  return state.expressions.list.reduce((acc: anyobj, curr, i) => {
+    if (indices !== undefined && !indexSet.has(i)) {
+      return acc;
+    }
+
+    const agregateSet = (obj: anyobj, prop: string, value: any) => {
+      // in is not an issue here because obj is created from null
+      if (!(prop in obj)) {
+        obj[prop] = new Set();
+        obj[prop].add(value);
+      } else if (obj[prop] instanceof Set) {
+        obj[prop].add(value);
+      } else {
+        throw TypeError("Object props must be a set");
+      }
+    };
+
+    const getValueTree = (obj: anyobj, src: ItemState) => {
+      Object.entries(src).forEach(([k, v]) => {
+        if ((v ?? null) !== null) {
+          if (
+            typeof v === "number" ||
+            typeof v === "string" ||
+            typeof v === "boolean"
+          ) {
+            agregateSet(obj, k, v);
+          } else if (Array.isArray(v)) {
+            if (!(k in obj)) {
+              obj[k] = Object.create(null);
+            }
+            v.forEach((subv) => getValueTree(obj[k], subv));
+          } else if (typeof v == "object") {
+            if (!(k in obj)) {
+              obj[k] = Object.create(null);
+            }
+            getValueTree(obj[k], v);
+          }
+        }
+      });
+    };
+
+    getValueTree(acc, curr);
+    return acc;
+  }, Object.create(null));
 };
 
 desv.renameAll = (regex: RegExp, repl: string) => {
