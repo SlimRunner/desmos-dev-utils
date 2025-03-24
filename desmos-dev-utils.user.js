@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     0.1.5
+// @version     0.1.6
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -114,18 +114,25 @@
           throw TypeError("Object props must be a set");
         }
       };
+      var isPrimitive = function isPrimitive2(v) {
+        return typeof v === "number" || typeof v === "string" || typeof v === "boolean";
+      };
       var _getValueTree = function getValueTree(obj, src) {
         Object.entries(src).forEach(function(_ref) {
           var _ref2 = _slicedToArray(_ref, 2), k = _ref2[0], v = _ref2[1];
           if ((v !== null && v !== void 0 ? v : null) !== null) {
-            if (typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
+            if (isPrimitive(v)) {
               agregateSet(obj, k, v);
             } else if (Array.isArray(v)) {
-              if (!(k in obj)) {
-                obj[k] = /* @__PURE__ */ Object.create(null);
-              }
               v.forEach(function(subv) {
-                return _getValueTree(obj[k], subv);
+                if (isPrimitive(subv)) {
+                  agregateSet(obj, k, subv);
+                } else {
+                  if (!(k in obj)) {
+                    obj[k] = /* @__PURE__ */ Object.create(null);
+                  }
+                  _getValueTree(obj[k], subv);
+                }
               });
             } else if (_typeof(v) == "object") {
               if (!(k in obj)) {
