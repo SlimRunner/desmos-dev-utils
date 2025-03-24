@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     0.1.4
+// @version     0.1.5
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -15,6 +15,14 @@
 "use strict";
 (function() {
   // src/index.ts
+  function _typeof(o) {
+    "@babel/helpers - typeof";
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o2) {
+      return typeof o2;
+    } : function(o2) {
+      return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
+    }, _typeof(o);
+  }
   function _slicedToArray(r, e) {
     return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
   }
@@ -67,6 +75,14 @@
   }
   defineCalc();
   var desv = /* @__PURE__ */ Object.create(null);
+  desv.getID = function(index) {
+    var _calculator$controlle;
+    return (_calculator$controlle = calculator.controller.getItemModelByIndex(index)) === null || _calculator$controlle === void 0 ? void 0 : _calculator$controlle.id;
+  };
+  desv.getIndex = function(id) {
+    var _calculator$controlle2;
+    return (_calculator$controlle2 = calculator.controller.getItemModel(id)) === null || _calculator$controlle2 === void 0 ? void 0 : _calculator$controlle2.index;
+  };
   desv.changeTitle = function(title) {
     calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title = title;
   };
@@ -80,6 +96,49 @@
     calculator.setState(state, {
       allowUndo: true
     });
+  };
+  desv.listProps = function(indices) {
+    var indexSet = new Set(indices);
+    var state = calculator.getState();
+    return state.expressions.list.reduce(function(acc, curr, i) {
+      if (indices !== void 0 && !indexSet.has(i)) {
+        return acc;
+      }
+      var agregateSet = function agregateSet2(obj, prop, value) {
+        if (!(prop in obj)) {
+          obj[prop] = /* @__PURE__ */ new Set();
+          obj[prop].add(value);
+        } else if (obj[prop] instanceof Set) {
+          obj[prop].add(value);
+        } else {
+          throw TypeError("Object props must be a set");
+        }
+      };
+      var _getValueTree = function getValueTree(obj, src) {
+        Object.entries(src).forEach(function(_ref) {
+          var _ref2 = _slicedToArray(_ref, 2), k = _ref2[0], v = _ref2[1];
+          if ((v !== null && v !== void 0 ? v : null) !== null) {
+            if (typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
+              agregateSet(obj, k, v);
+            } else if (Array.isArray(v)) {
+              if (!(k in obj)) {
+                obj[k] = /* @__PURE__ */ Object.create(null);
+              }
+              v.forEach(function(subv) {
+                return _getValueTree(obj[k], subv);
+              });
+            } else if (_typeof(v) == "object") {
+              if (!(k in obj)) {
+                obj[k] = /* @__PURE__ */ Object.create(null);
+              }
+              _getValueTree(obj[k], v);
+            }
+          }
+        });
+      };
+      _getValueTree(acc, curr);
+      return acc;
+    }, /* @__PURE__ */ Object.create(null));
   };
   desv.renameAll = function(regex, repl) {
     var expressionWithTokenFilter = function expressionWithTokenFilter2(item) {
@@ -138,12 +197,12 @@
     var exprlist = calculator.getState().expressions.list;
     return exprlist.map(function(e) {
       return [e.id, parseInt(e.id)];
-    }).filter(function(_ref) {
-      var _ref2 = _slicedToArray(_ref, 2), _ = _ref2[0], num = _ref2[1];
+    }).filter(function(_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2), _ = _ref4[0], num = _ref4[1];
       return !isNaN(num);
-    }).reduce(function(_ref3, _ref4) {
-      var _ref5 = _slicedToArray(_ref3, 2), acid = _ref5[0], acnum = _ref5[1];
-      var _ref6 = _slicedToArray(_ref4, 2), id = _ref6[0], num = _ref6[1];
+    }).reduce(function(_ref5, _ref6) {
+      var _ref7 = _slicedToArray(_ref5, 2), acid = _ref7[0], acnum = _ref7[1];
+      var _ref8 = _slicedToArray(_ref6, 2), id = _ref8[0], num = _ref8[1];
       return acnum > num ? [acid, acnum] : [id, num];
     })[0];
   };
