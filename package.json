@@ -1,6 +1,6 @@
 {
   "name": "desmos-dev-utils",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Web console utilities for Desmos",
   "main": "index.js",
   "scripts": {
