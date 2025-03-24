@@ -84,20 +84,28 @@ desv.listProps = (indices: number[] | undefined) => {
       }
     };
 
-    const getValueTree = (obj: anyobj, src: ItemState) => {
+    const isPrimitive = (v: any) => {
+      return (
+        typeof v === "number" || typeof v === "string" || typeof v === "boolean"
+      );
+    };
+
+    const getValueTree = (obj: anyobj, src: ItemState | any) => {
       Object.entries(src).forEach(([k, v]) => {
         if ((v ?? null) !== null) {
-          if (
-            typeof v === "number" ||
-            typeof v === "string" ||
-            typeof v === "boolean"
-          ) {
+          if (isPrimitive(v)) {
             agregateSet(obj, k, v);
           } else if (Array.isArray(v)) {
-            if (!(k in obj)) {
-              obj[k] = Object.create(null);
-            }
-            v.forEach((subv) => getValueTree(obj[k], subv));
+            v.forEach((subv) => {
+              if (isPrimitive(subv)){
+                agregateSet(obj, k, subv)
+              } else {
+                if (!(k in obj)) {
+                  obj[k] = Object.create(null);
+                }
+                getValueTree(obj[k], subv)
+              }
+            });
           } else if (typeof v == "object") {
             if (!(k in obj)) {
               obj[k] = Object.create(null);
