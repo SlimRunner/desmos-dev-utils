@@ -49,8 +49,8 @@ desv.getID = (index: number) =>
 desv.getIndex = (id: string) => calculator.controller.getItemModel(id)?.index;
 
 desv.changeTitle = (title: string) => {
-  calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title =
-    title;
+  const gc = calculator?._calc?.globalHotkeys?.shellController?.graphsController;
+  gc.currentGraph.title = title;
 };
 
 desv.batchEditor = (options: {

@@ -198,11 +198,13 @@ export interface TimingData {
 }
 
 export interface TopLevelComponents {
-  mygraphsController: {
+  shellController: {
     graphsController: {
       currentGraph: {
         title: string
       };
+      isCurrentGraphTitled: () => boolean;
+      getCurrentGraphTitle: () => string;
     };
   };
 }
