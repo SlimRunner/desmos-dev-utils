@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     0.1.6
+// @version     0.1.7
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -84,7 +84,9 @@
     return (_calculator$controlle2 = calculator.controller.getItemModel(id)) === null || _calculator$controlle2 === void 0 ? void 0 : _calculator$controlle2.index;
   };
   desv.changeTitle = function(title) {
-    calculator._calc.globalHotkeys.mygraphsController.graphsController.currentGraph.title = title;
+    var _calculator;
+    var gc = (_calculator = calculator) === null || _calculator === void 0 || (_calculator = _calculator._calc) === null || _calculator === void 0 || (_calculator = _calculator.globalHotkeys) === null || _calculator === void 0 || (_calculator = _calculator.shellController) === null || _calculator === void 0 ? void 0 : _calculator.graphsController;
+    gc.currentGraph.title = title;
   };
   desv.batchEditor = function(options) {
     var _options$filter, _options$mapper;
