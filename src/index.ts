@@ -21,10 +21,14 @@ interface Desv {
   renameAll: (regex: RegExp, repl: string) => void;
   addNamePrefixToAll: (prefix: string) => void;
   getLargestNumericID: () => string;
-  batchEditor: (options: {
-    filter?: (item: ItemState) => void;
-    mapper?: (item: ItemState) => void;
-  }) => void;
+  batchMutate: (
+    mutator: (item: ItemState, index: number) => void,
+    filter?: (item: ItemState, index: number) => boolean,
+  ) => void;
+  batchTransform: (
+    transform: (item: ItemState, index: number) => ItemState,
+    filter?: (item: ItemState, index: number) => boolean,
+  ) => void;
   listProps: (indices: number[]) => any[];
   enlistPropValues: (indices: number[]) => any[];
 }
@@ -53,14 +57,28 @@ desv.changeTitle = (title: string) => {
   gc.currentGraph.title = title;
 };
 
-desv.batchEditor = (options: {
-  filter?: (item: ItemState) => void;
-  mapper?: (item: ItemState) => void;
-}) => {
+desv.batchMutate = (
+  mutator: (item: ItemState, index: number) => ItemState,
+  filter?: (item: ItemState, index: number) => boolean,
+) => {
   const state = calculator.getState();
+
   state.expressions.list
-    .filter(options.filter ?? (() => true))
-    .forEach(options.mapper ?? (() => {}));
+    .filter(filter ?? (() => true))
+    .forEach(mutator);
+
+  calculator.setState(state, { allowUndo: true });
+};
+
+desv.batchTransform = (
+  transform: (item: ItemState, index: number) => ItemState,
+  filter?: (item: ItemState, index: number) => boolean,
+) => {
+  const state = calculator.getState();
+
+  state.expressions.list = state.expressions.list.map((e, i) =>
+    (filter ?? (() => true))(e, i) ? transform(e, i) : e
+  );
   calculator.setState(state, { allowUndo: true });
 };
 
