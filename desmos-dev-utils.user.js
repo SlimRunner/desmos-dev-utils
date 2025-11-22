@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     1.0.0
+// @version     1.1.0
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -223,6 +223,31 @@
       var _ref8 = _slicedToArray(_ref6, 2), id = _ref8[0], num = _ref8[1];
       return acnum > num ? [acid, acnum] : [id, num];
     })[0];
+  };
+  desv.tableLoader = function(text) {
+    var rowSep = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "\n";
+    var colSep = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : ",";
+    var table = text.split(rowSep).map(function(row) {
+      return row.split(colSep);
+    });
+    var transpose = table[0].map(function() {
+      return [];
+    });
+    table.forEach(function(row) {
+      return row.map(function(col, i) {
+        return transpose[i].push(col);
+      });
+    });
+    var columns = transpose.map(function(e) {
+      return {
+        latex: e[0],
+        values: e.slice(1)
+      };
+    });
+    calculator.setExpression({
+      type: "table",
+      columns: columns
+    });
   };
   window.desv = desv;
 })();
