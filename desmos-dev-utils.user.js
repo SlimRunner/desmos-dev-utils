@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        desmos-dev-utils
 // @namespace   slidav.Desmos
-// @version     0.1.7
+// @version     1.0.0
 // @author      David Flores
 // @description Web console utilities for Desmos
 // @grant       none
@@ -88,12 +88,21 @@
     var gc = (_calculator = calculator) === null || _calculator === void 0 || (_calculator = _calculator._calc) === null || _calculator === void 0 || (_calculator = _calculator.globalHotkeys) === null || _calculator === void 0 || (_calculator = _calculator.shellController) === null || _calculator === void 0 ? void 0 : _calculator.graphsController;
     gc.currentGraph.title = title;
   };
-  desv.batchEditor = function(options) {
-    var _options$filter, _options$mapper;
+  desv.batchMutate = function(mutator, filter) {
     var state = calculator.getState();
-    state.expressions.list.filter((_options$filter = options.filter) !== null && _options$filter !== void 0 ? _options$filter : function() {
+    state.expressions.list.filter(filter !== null && filter !== void 0 ? filter : function() {
       return true;
-    }).forEach((_options$mapper = options.mapper) !== null && _options$mapper !== void 0 ? _options$mapper : function() {
+    }).forEach(mutator);
+    calculator.setState(state, {
+      allowUndo: true
+    });
+  };
+  desv.batchTransform = function(transform, filter) {
+    var state = calculator.getState();
+    state.expressions.list = state.expressions.list.map(function(e, i) {
+      return (filter !== null && filter !== void 0 ? filter : function() {
+        return true;
+      })(e, i) ? transform(e, i) : e;
     });
     calculator.setState(state, {
       allowUndo: true
