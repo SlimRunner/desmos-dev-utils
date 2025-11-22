@@ -1,5 +1,5 @@
 import { Calc } from "Calc";
-import { ItemModel, ExpressionModel } from "models";
+import { ItemModel, TableModel, ExpressionModel } from "models";
 import { ItemState } from "state";
 
 export let calculator: Calc;
@@ -30,7 +30,7 @@ interface Desv {
     filter?: (item: ItemState, index: number) => boolean,
   ) => void;
   listProps: (indices: number[]) => any[];
-  enlistPropValues: (indices: number[]) => any[];
+  tableLoader: (text: string, rowSep: string, colSep: string) => void;
 }
 
 type DesvKeys<T> = {
@@ -222,5 +222,23 @@ desv.getLargestNumericID = () => {
       acnum > num ? [acid, acnum] : [id, num]
     )[0];
 };
+
+desv.tableLoader = (text: string, rowSep = "\n", colSep = ",") => {
+  const table = text.split(rowSep).map(row => row.split(colSep));
+  const transpose: string[][] = table[0].map(() => []);
+  table.forEach((row) => row.map((col, i) => transpose[i].push(col)));
+  const columns = transpose.map((e) => {
+    return {
+      latex: e[0],
+      values: e.slice(1)
+    }
+  })
+  calculator.setExpression(
+    {
+      type: "table",
+      columns,
+    }
+  )
+}
 
 window.desv = desv;
